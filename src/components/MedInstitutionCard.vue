@@ -1,45 +1,49 @@
 <template>
-  <v-card :class="rootClasses" width="300" elevation="4" @click="$emit('click')">
-    <div :class="$style.medName">Частная клиника "Здоровье"</div>
-    <div :class="$style.budget">2 000 000 руб.</div>
-    <div :class="$style.companyName">ООО "Стройсвет"</div>
-    <div :class="$style.innNumber">ИНН 98423245</div>
+  <v-card :class="rootClasses" width="210" elevation="4" @click="showExpand = !showExpand">
+    <div :class="$style.medName" v-text="medName"/>
+    <div :class="$style.budget" v-text="`${medBudget} руб.`"/>
+    <div :class="$style.companyName" v-text="companyName"/>
+    <div :class="$style.innNumber" v-text="innNumber"/>
 
     <v-expand-transition>
-      <div v-if="show">
+      <div v-if="showExpand">
         <div :class="$style.statusContainer">
-          <v-chip v-for="status in ['Исполнение', 'На экспертизе', 'Новая']" color="#bdbde5" text-color="white" :class="$style.status" v-text="status"/>
+          <v-chip v-for="status in orderStatuses"
+                  :class="$style.status"
+                  v-text="status"
+                  color="#bdbde5"
+                  text-color="white"/>
         </div>
-        <div :class="$style.customerName">Иванов И.И</div>
+        <div :class="$style.customerName" v-text="customerName"/>
 
         <div :class="$style.statusContainer">
-          <v-chip v-for="status in ['Физиотерапия', 'Неврология']" color="primary" text-color="white" :class="$style.status" v-text="status"/>
+          <v-chip v-for="program in orderPrograms"
+                  :class="$style.status"
+                  v-text="program"
+                  color="primary"
+                  text-color="white"/>
         </div>
       </div>
     </v-expand-transition>
 
     <div :class="$style.orderInfo">
-      <div :class="$style.orderNumber">2334562</div>
-      <div :class="$style.orderDate">от 20.12.2021</div>
+      <div :class="$style.orderNumber" v-text="orderNumber"/>
+      <div :class="$style.orderDate" v-text="`от ${orderDate}`"/>
     </div>
 
   </v-card>
 </template>
 
-<script lang="ts">
+<script>
 export default {
   name: 'MedInstitutionCard',
   props: {
-    show: {
-      type: Boolean,
-      default: false
-    },
     medName: {
       type: String,
       required: true
     },
     medBudget: {
-      type: Number,
+      type: String,
       required: true
     },
     companyName: {
@@ -47,10 +51,14 @@ export default {
       required: true
     },
     innNumber: {
-      type: Number,
+      type: String,
       required: true
     },
     orderStatuses: {
+      type: Array,
+      default: null
+    },
+    orderPrograms: {
       type: Array,
       default: null
     },
@@ -59,7 +67,7 @@ export default {
       default: null
     },
     orderNumber: {
-      type: Number,
+      type: String,
       default: null
     },
     orderDate: {
@@ -68,14 +76,14 @@ export default {
     }
   },
   data: () => ({
-
+    showExpand: false,
   }),
   computed: {
     rootClasses () {
       return [
         this.$style.root,
         {
-          [this.$style.maxCardHeight]: !this.show
+          [this.$style.maxCardHeight]: !this.showExpand
         }
       ];
     }
@@ -85,73 +93,85 @@ export default {
 
 <style lang="scss" module>
 .root {
-  margin: 1.5rem 0 0 1.5rem;
+  margin: 0 1rem 1rem 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .maxCardHeight {
-  max-height: 170px;
+  max-height: 198px;
 }
 
-.medName,
-.budget,
-.companyName {
-  margin-left: 1rem;
-}
+  .medName,
+  .budget,
+  .companyName,
+  .orderDate {
+    margin-left: 1rem;
+  }
 
-.budget {
-  font-size: medium;
-}
+  .innNumber,
+  .orderNumber,
+  .orderDate {
+    color: gray;
+  }
 
-.medName {
-  padding-top: 1rem;
-  font-size: large;
-  font-weight: bold;
-}
+  .budget {
+    font-size: medium;
+  }
 
-.companyName {
-  padding-top: 0.5rem;
-  font-weight: bold;
-  font-size: medium;
-}
+  .medName {
+    padding-top: 1rem;
+    padding-right: 0.5rem;
+    font-size: large;
+    font-weight: bold;
+  }
 
-.innNumber {
-  color: gray;
-  padding-left: 1rem;
-}
+  .companyName {
+    padding-top: 0.5rem;
+    font-weight: bold;
+    font-size: medium;
+  }
 
-.statusContainer {
-  max-width: 300px;
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
-  padding-left: 1rem;
-}
+  .innNumber {
+    padding-left: 1rem;
+  }
 
-.status {
-  margin-right: 0.5rem;
-  margin-top: 0.5rem;
-}
+  .statusContainer {
+    max-width: 300px;
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+  }
 
-.orderInfo {
-  padding: 0.5rem 1rem 1rem 1rem;
-  display: flex;
-  justify-content: space-between;
-}
+  .status {
+    margin-right: 0.5rem;
+    margin-top: 0.5rem;
+  }
 
-.orderNumber {
-  color: gray;
-  margin-right: 2rem;
-}
+  .orderInfo {
+    margin-top: auto;
+    padding: 0.5rem 1rem 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+  }
 
-.orderDate {
-  color: gray;
-}
+  .orderNumber {
+    margin-right: auto;
+  }
 
-.customerName {
-  margin-top: 1rem;
-  padding: 1rem 0 1rem 1rem;
-  background: #e5e5f8;
-  font-size: large;
-}
+  .orderDate {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .customerName {
+    margin-top: 1rem;
+    padding: 1rem 0 1rem 1rem;
+    background: #e5e5f8;
+    font-size: medium;
+    font-weight: bold;
+  }
 </style>
+

@@ -1,16 +1,20 @@
 <template>
-  <v-toolbar class="rounded-pill" floating short>
+  <div :style="{ width: `${width}rem` }">
     <v-text-field :placeholder="placeholder"
-                  prepend-icon="mdi-magnify"
-                  hide-details
+                  prepend-inner-icon="mdi-magnify"
+                  dense
+                  outlined
                   single-line
-                  flat
                   solo
-                  @input="handleInput"/>
-  </v-toolbar>
+                  autofocus
+                  clearable
+                  rounded
+                  @change="handleInput"
+                  @click:clear="handleClear"/>
+  </div>
 </template>
 
-<script lang="ts">
+<script>
   export default {
     name: 'Search',
 
@@ -18,12 +22,19 @@
       placeholder: {
         type: String,
         default: null
+      },
+      width: {
+        type: Number,
+        default: 12
       }
     },
 
     methods: {
       handleInput (inputValue) {
         this.$emit('input', inputValue);
+      },
+      handleClear () {
+        this.$emit('clear');
       }
     }
   };

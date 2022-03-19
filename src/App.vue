@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar :class="$style.root" app color="primary" dark>
+    <v-app-bar app color="primary" dark>
       <div class="d-flex align-center">
         <v-img
           alt="Vuetify Logo"
@@ -21,19 +21,8 @@
   </v-app>
 </template>
 
-<script>
-
+<script lang="ts">
 export default {
-  name: 'App',
-
-  data: () => ({
-    //
-  }),
+  name: 'App'
 };
 </script>
-
-<style lang="scss" module>
-.root {
-
-}
-</style>
