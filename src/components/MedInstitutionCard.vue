@@ -34,61 +34,31 @@
   </v-card>
 </template>
 
-<script>
-export default {
-  name: 'MedInstitutionCard',
-  props: {
-    medName: {
-      type: String,
-      required: true
-    },
-    medBudget: {
-      type: String,
-      required: true
-    },
-    companyName: {
-      type: String,
-      required: true
-    },
-    innNumber: {
-      type: String,
-      required: true
-    },
-    orderStatuses: {
-      type: Array,
-      default: null
-    },
-    orderPrograms: {
-      type: Array,
-      default: null
-    },
-    customerName: {
-      type: String,
-      default: null
-    },
-    orderNumber: {
-      type: String,
-      default: null
-    },
-    orderDate: {
-      type: String,
-      default: null
-    }
-  },
-  data: () => ({
-    showExpand: false,
-  }),
-  computed: {
-    rootClasses () {
-      return [
-        this.$style.root,
-        {
-          [this.$style.maxCardHeight]: !this.showExpand
-        }
-      ];
-    }
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+
+@Component
+export default class MedInstitutionCard extends Vue {
+  showExpand = false
+  @Prop ({ required: true }) medName!: string
+  @Prop ({ required: true }) medBudget!: string
+  @Prop ({ default: null })companyName!: string
+  @Prop ({ default: null }) innNumber!: string
+  @Prop ({ default: null }) orderStatuses!: string[]
+  @Prop ({ default: null }) orderPrograms!: string[]
+  @Prop ({ default: null }) customerName!: string
+  @Prop ({ default: null }) orderNumber!: string
+  @Prop ({ default: null }) orderDate!: string
+
+  get rootClasses() {
+    return [
+      this.$style.root,
+      {
+        [this.$style.maxCardHeight]: !this.showExpand
+      }
+    ];
   }
-};
+}
 </script>
 
 <style lang="scss" module>

@@ -1,6 +1,7 @@
 <template>
   <div :style="{ width: `${width}rem` }">
     <v-text-field :placeholder="placeholder"
+                  :value="value"
                   prepend-inner-icon="mdi-magnify"
                   dense
                   outlined
@@ -9,33 +10,40 @@
                   autofocus
                   clearable
                   rounded
-                  @change="handleInput"
-                  @click:clear="handleClear"/>
+                  @input="handleInput"
+                  @click:append="handleClear"/>
   </div>
 </template>
 
-<script>
-  export default {
-    name: 'Search',
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
 
-    props: {
-      placeholder: {
-        type: String,
-        default: null
-      },
-      width: {
-        type: Number,
-        default: 12
-      }
+@Component ({
+  name: 'Search',
+
+  props: {
+    value: {
+      type: String,
+      default: null
     },
-
-    methods: {
-      handleInput (inputValue) {
-        this.$emit('input', inputValue);
-      },
-      handleClear () {
-        this.$emit('clear');
-      }
+    placeholder: {
+      type: String,
+      default: null
+    },
+    width: {
+      type: Number,
+      default: 12
     }
-  };
+  },
+
+  methods: {
+    handleInput (value: string) {
+      this.$emit('input', value);
+    },
+    handleClear () {
+      this.$emit('clear');
+    }
+  }
+})
+export default class Search extends Vue {}
 </script>

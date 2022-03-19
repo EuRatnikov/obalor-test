@@ -2,23 +2,25 @@
   <div :class="$style.root">
     <div :class="$style.searches">
       <Search placeholder="Номер заявки"
+              :value="orderFilterValue"
               :width="12"
-              @change="handleOrderNumberInput"
+              @input="handleOrderNumberInput"
               @clear="handleClearOrderNumber"/>
 
       <Search :class="$style.search"
+              :value="companyFilterValue"
               placeholder="Название компании"
               :width="15"
-              @change="handleCompanyNameInput"
+              @input="handleCompanyNameInput"
               @clear="handleClearCompanyName"/>
     </div>
-    <div :class="$style.cards" v-if="!isLoading">
+    <div :class="$style.cards" v-if="medCards.length && !isLoading">
       <MedInstitutionCard v-for="card in medCards"
                           v-bind="card"
                           @click="handleClickCard(card)"/>
     </div>
 
-    <div :class="$style.cards" v-else>
+    <div :class="$style.cards" v-else-if="!medCards.length && isLoading">
       <v-sheet
           v-for="i in 10" :id="i"
           color="grey lighten-4"
@@ -33,66 +35,69 @@
         ></v-skeleton-loader>
       </v-sheet>
     </div>
+
+    <div v-else-if="!medCards.length">
+      <div>Нет результатов</div>
+    </div>
   </div>
 </template>
 
-<script>
-  import MedInstitutionCard from "../components/MedInstitutionCard.vue";
-  import Search from "../components/Search.vue";
-  import { homeModule } from "@/store";
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import { MedCard } from "@/types";
+import { homeModule } from "@/store";
 
-  export default {
-    name: 'HomeView',
+import MedInstitutionCard from "../components/MedInstitutionCard.vue";
+import Search from "../components/Search.vue";
 
-    components: {
-      MedInstitutionCard,
-      Search
+@Component({
+  name: 'HomeView',
+  components: {
+    MedInstitutionCard,
+    Search
+  },
+  mounted() {
+    homeModule.actions.prepareMedCards();
+  },
+  methods: {
+    handleClickCard (card: MedCard) {
+      card.showExpand = !card.showExpand;
     },
-
-    data: () => ({
-      isLoading: true
-    }),
-
-    methods: {
-      handleClickCard (card) {
-        card.showExpand = !card.showExpand;
-      },
-      handleOrderNumberInput (value) {
-
-      },
-      handleClearOrderNumber () {
-
-      },
-      handleCompanyNameInput (value) {
-
-      },
-      handleClearCompanyName () {
-
-      }
+    handleOrderNumberInput (value: string) {
+      homeModule.actions.filterByOrder(value);
     },
-
-    computed: {
-      medCards () {
-        return homeModule.state.medCards;
-      }
+    handleClearOrderNumber () {
+      homeModule.actions.clearOrderFilter();
     },
-
-    asyncComputed: {
-      mockCards: {
-        async get () {
-          return homeModule.actions.getMedCards();
-        },
-        default: []
-      }
+    handleCompanyNameInput (value: string) {
+      homeModule.actions.filterByCompanyName(value);
+    },
+    handleClearCompanyName () {
+      homeModule.actions.clearCompanyFilter();
+    }
+  },
+  computed: {
+    medCards () {
+      return homeModule.state.medCards;
+    },
+    orderFilterValue () {
+      return homeModule.state.orderFilter;
+    },
+    companyFilterValue () {
+      return homeModule.state.companyFilter;
+    },
+    isLoading () {
+      return homeModule.state.isLoading;
     }
   }
+})
+export default class HomeView extends Vue {}
 </script>
 
 <style lang="scss" module>
 .root {
   overflow-y: hidden;
 }
-
 .cards {
   position: relative;
   width: 100%;
@@ -104,20 +109,16 @@
   -webkit-overflow-scrolling: touch;
   padding: 0.1rem 0 1rem 2rem;
 }
-
 .searches {
   display: flex;
   flex-direction: row;
   margin: 2rem 2rem 0 2rem;
 }
-
 .search {
   margin-left: 1rem;
 }
-
 .skeletonCard {
   width: 300px;
   height: 200px;
 }
-
 </style>
