@@ -75,11 +75,11 @@ export default class HomeActions extends Actions<HomeState, HomeGetters, HomeMut
             const { cards } = data || {};
             this.commit('setOriginalMedCards', cards);
             this.commit('setMedCards', cards);
-            this.commit('setIsLoading', false);
         } catch (err) {
             console.error(err, 'ERROR in getMedCards');
             throw Error('Request error! Something goes wrong in prepareMedCards')
         }
+        this.commit('setIsLoading', false);
     }
 }
 

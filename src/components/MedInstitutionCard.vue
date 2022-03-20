@@ -1,8 +1,13 @@
 <template>
-  <v-card class="d-flex flex-column" :class="rootClasses" width="220" elevation="4" @click="showExpand = !showExpand">
+  <v-card v-if="!isLoading"
+          class="d-flex flex-column"
+          :class="rootClasses"
+          :width="cardWidth"
+          elevation="4"
+          @click="showExpand = !showExpand">
     <div :class="$style.header">
       <div :class="$style.medName" v-text="medName"/>
-      <v-checkbox v-show="showExpand" :class="$style.checkBox" v-model="isCardSelected" @click.stop/>
+      <v-checkbox v-show="showExpand" class="mt-0" :class="$style.checkBox" v-model="isCardSelected" @click.stop/>
     </div>
 
     <div :class="$style.budget" v-text="`${medBudget} руб.`"/>
@@ -28,6 +33,14 @@
     </div>
 
   </v-card>
+
+  <v-skeleton-loader v-else
+      :class="$style.root"
+      elevation="4"
+      type="article, actions"
+      :width="cardWidth"
+      :height="cardHeight"
+  ></v-skeleton-loader>
 </template>
 
 <script lang="ts">
@@ -37,6 +50,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 export default class MedInstitutionCard extends Vue {
   showExpand = false
   isCardSelected = false
+  cardWidth = window.innerWidth <= 600 ? 300 : 220;
+  cardHeight = window.innerWidth <= 600  ? 155 : 190;
+
   @Prop ({ required: true }) medName!: string
   @Prop ({ required: true }) medBudget!: string
   @Prop ({ default: null }) companyName!: string
@@ -46,6 +62,20 @@ export default class MedInstitutionCard extends Vue {
   @Prop ({ default: null }) customerName!: string
   @Prop ({ default: null }) orderNumber!: string
   @Prop ({ default: null }) orderDate!: string
+  @Prop ({ default: true }) isLoading!: boolean
+
+  public handleResize() {
+    this.cardWidth = window.innerWidth <= 600 ? 300 : 220;
+    this.cardHeight = window.innerHeight <= 600 ? 155 : 198;
+  }
+
+  public mounted() {
+    window.addEventListener('resize', this.handleResize);
+  }
+
+  public beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  }
 
   get rootClasses () {
     return [
@@ -60,9 +90,21 @@ export default class MedInstitutionCard extends Vue {
 </script>
 
 <style lang="scss" module>
+  @media screen and (max-width: 600px) {
+    .root {
+      margin-bottom: 1rem;
+    }
+  }
+
+  @media screen and (min-width: 600px) {
+    .root {
+      margin: 0 1rem 1rem 0;
+    }
+  }
+
   .root {
-    margin: 0 1rem 1rem 0;
     display: flex;
+    flex-direction: column;
   }
 
   .expand {
@@ -70,7 +112,20 @@ export default class MedInstitutionCard extends Vue {
   }
 
   .normalState {
-    max-height: 11.9rem;
+    max-height: 11.4rem;
+  }
+
+  .header,
+  .budget,
+  .companyName,
+  .orderDate {
+    margin-left: 1rem;
+  }
+
+  .innNumber,
+  .orderNumber,
+  .orderDate {
+    color: gray;
   }
 
   .header {
@@ -79,7 +134,7 @@ export default class MedInstitutionCard extends Vue {
   }
 
   .checkBox {
-    margin-top: unset;
+    margin-left: auto;
   }
 
   .medName {
@@ -138,19 +193,6 @@ export default class MedInstitutionCard extends Vue {
     background: #e5e5f8;
     font-size: medium;
     font-weight: bold;
-  }
-
-  .header,
-  .budget,
-  .companyName,
-  .orderDate {
-    margin-left: 1rem;
-  }
-
-  .innNumber,
-  .orderNumber,
-  .orderDate {
-    color: gray;
   }
 </style>
 

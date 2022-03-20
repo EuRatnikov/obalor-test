@@ -14,30 +14,22 @@
               @input="handleCompanyNameInput"
               @clear="handleClearCompanyName"/>
     </div>
-    <div v-if="medCards.length && !isLoading"
+
+    <div v-if="isLoading" :class="$style.cards">
+      <MedInstitutionCard v-for="i in 10"
+                          :key="i"
+                          :isLoading="true"/>
+    </div>
+
+    <div v-else-if="medCards.length"
          :class="$style.cards">
-      <MedInstitutionCard v-for="card in medCards"
-                          :key="card.orderNumber"
+      <MedInstitutionCard v-for="(card, index) in medCards"
+                          :key="index"
+                          :isLoading="isLoading"
                           v-bind="card"/>
     </div>
 
-    <div v-else-if="!medCards.length && isLoading"
-         :class="$style.cards">
-      <v-sheet v-for="i in 10"
-               :key="i"
-               color="grey lighten-4"
-               class="pa-3">
-        <v-skeleton-loader
-            :class="$style.skeletonCard"
-            elevation="4"
-            type="article, actions"
-            max-width="215"
-            max-height="198"
-        ></v-skeleton-loader>
-      </v-sheet>
-    </div>
-
-    <div v-else-if="!medCards.length" :class="$style.noFilterResultContainer">
+    <div v-else-if="!medCards.length && !isLoading" :class="$style.noFilterResultContainer">
       <div :class="$style.noFilterResultText">
         По заданным фильтрам нет результатов
       </div>
@@ -100,49 +92,56 @@ export default class HomeView extends Vue {}
 </script>
 
 <style lang="scss" module>
+  @media screen and (max-width: 600px) {
+    .cards {
+      justify-content: center;
+      padding: 0.1rem 0 1rem 0;
+    }
+  }
+
+  @media screen and (min-width: 600px) {
+    .cards {
+      padding: 0.1rem 0 1rem 2rem;
+    }
+  }
+
  .root {
    overflow-y: hidden;
    display: flex;
    flex-direction: column;
  }
 
-.cards {
-  position: relative;
-  width: 100%;
-  height: calc(100% - 4.2rem);
-  display: flex;
-  flex-wrap: wrap;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  -webkit-overflow-scrolling: touch;
-  padding: 0.1rem 0 1rem 2rem;
-}
+  .cards {
+    position: relative;
+    width: 100%;
+    height: calc(100% - 4.2rem);
+    display: flex;
+    flex-wrap: wrap;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
 
-.searches {
-  display: flex;
-  flex-direction: row;
-  margin: 2rem 2rem 0 2rem;
-}
+  .searches {
+    display: flex;
+    flex-direction: row;
+    margin: 2rem 2rem 0 2rem;
+  }
 
-.search {
-  margin-left: 1rem;
-}
+  .search {
+    margin-left: 1rem;
+  }
 
-.skeletonCard {
-  width: 300px;
-  height: 200px;
-}
+  .noFilterResultContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 
-.noFilterResultContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.noFilterResultText {
-  font-weight: normal;
-  font-size: large;
-  margin-bottom: 0.5rem;
-}
+  .noFilterResultText {
+    font-weight: normal;
+    font-size: large;
+    margin-bottom: 0.5rem;
+  }
 </style>

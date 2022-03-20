@@ -1,16 +1,27 @@
 # test-abalon
+Привет! Хотел по максимум выжить из тестового задания,
+поэтому решил делать с использованеим чего-то нового для меня.
 
-## Project setup
+Vuetify
+
+vue-property-decorator
+
+vuex-smart-module
+
+В целом выделил ограниченное количество времени на задание.
+До идеала довести не смог, есть проблемы, которые нужно решить.
+
+## Установка зависимостей
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Запуск локального сервера
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Сборка билда для деплоя
 ```
 npm run build
 ```
