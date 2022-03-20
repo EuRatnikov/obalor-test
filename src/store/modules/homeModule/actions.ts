@@ -6,27 +6,20 @@ import HomeMutations from "./mutations";
 import HomeGetters from "./getters";
 import axios from "axios";
 
-export default class HomeActions extends Actions<HomeState, HomeGetters ,HomeMutations> {
+export default class HomeActions extends Actions<HomeState, HomeGetters, HomeMutations> {
     filterByOrder (value: string) {
         if (!value)
             return this.clearOrderFilter();
 
         this.commit('setIsLoading', true);
+        this.commit('setOrderFilter', value.toLowerCase());
+
         const cards: MedCard[] = this.state.originalMedCards
-            ?.filter(({ orderNumber }) => orderNumber.toLowerCase().startsWith(value.toLowerCase()))
-            ?.filter(({ medName }) => this.state.companyFilter ? medName.toLowerCase().startsWith(this.state.companyFilter.toLowerCase()) : true);
-        this.commit('setOrderFilter', value);
+            ?.filter(({ orderNumber }) => filterBy(orderNumber, this.state.orderFilter!))
+            ?.filter(({ medName }) => this.state.companyFilter ? filterBy(medName, this.state.companyFilter): true);
+
         this.commit('setMedCards', cards);
         this.commit('setIsLoading', false);
-    }
-
-    clearOrderFilter () {
-        if (this.state.companyFilter)
-            this.commit('setMedCards', this.state.originalMedCards.filter(({ medName }) => medName.toLowerCase().startsWith(this.state.companyFilter!.toLowerCase())));
-        else
-            this.commit('setMedCards', this.state.originalMedCards);
-
-        this.commit('setOrderFilter', undefined);
     }
 
     filterByCompanyName (value: string) {
@@ -34,10 +27,12 @@ export default class HomeActions extends Actions<HomeState, HomeGetters ,HomeMut
             return this.clearCompanyFilter();
 
         this.commit('setIsLoading', true);
+        this.commit('setCompanyFilter', value.toLowerCase());
+
         const cards: MedCard[] = this.state.originalMedCards
-            ?.filter(({ medName }) => medName.toLowerCase().startsWith(value.toLowerCase()))
-            ?.filter(({ orderNumber }) => this.state.orderFilter ? orderNumber.toLowerCase().startsWith(this.state.orderFilter.toLowerCase()) : true);
-        this.commit('setCompanyFilter', value);
+            ?.filter(({ medName }) => filterBy(medName, this.state.companyFilter!))
+            ?.filter(({ orderNumber }) => this.state.orderFilter ? filterBy(orderNumber, this.state.orderFilter): true);
+
         this.commit('setMedCards', cards);
         this.commit('setIsLoading', false);
 
@@ -45,13 +40,28 @@ export default class HomeActions extends Actions<HomeState, HomeGetters ,HomeMut
             this.filterByOrder(this.state.orderFilter);
     }
 
+    clearOrderFilter () {
+        if (this.state.companyFilter)
+            this.commit('setMedCards', this.state.originalMedCards.filter(({ medName }) => filterBy(medName, this.state.companyFilter!)));
+        else
+            this.commit('setMedCards', this.state.originalMedCards);
+
+        this.commit('setOrderFilter', undefined);
+    }
+
     clearCompanyFilter () {
         if (this.state.orderFilter)
-            this.commit('setMedCards', this.state.originalMedCards.filter(({ orderNumber }) => orderNumber.toLowerCase().startsWith(this.state.orderFilter!.toLowerCase())));
+            this.commit('setMedCards', this.state.originalMedCards.filter(({ orderNumber }) => filterBy(orderNumber, this.state.orderFilter!)));
         else
             this.commit('setMedCards', this.state.originalMedCards);
 
         this.commit('setCompanyFilter', undefined);
+    }
+
+    clearAllFilters () {
+        this.commit('setMedCards', this.state.originalMedCards);
+        this.commit('setCompanyFilter', undefined);
+        this.commit('setOrderFilter', undefined);
     }
 
     async prepareMedCards () {
@@ -63,13 +73,16 @@ export default class HomeActions extends Actions<HomeState, HomeGetters ,HomeMut
                 return null;
 
             const { cards } = data || {};
-            const preparedCards = cards.map((card: MedCard) => ({ ...card, showExpand: false }));
-            this.commit('setOriginalMedCards', preparedCards);
-            this.commit('setMedCards', preparedCards);
+            this.commit('setOriginalMedCards', cards);
+            this.commit('setMedCards', cards);
             this.commit('setIsLoading', false);
         } catch (err) {
             console.error(err, 'ERROR in getMedCards');
-            return null;
+            throw Error('Request error! Something goes wrong in prepareMedCards')
         }
     }
+}
+
+function filterBy (filterableValue: string, inputValue: string) {
+    return filterableValue.toLowerCase().startsWith(inputValue)
 }

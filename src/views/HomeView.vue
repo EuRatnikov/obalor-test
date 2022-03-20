@@ -3,29 +3,30 @@
     <div :class="$style.searches">
       <Search placeholder="Номер заявки"
               :value="orderFilterValue"
-              :width="12"
+              :width="11.8"
               @input="handleOrderNumberInput"
               @clear="handleClearOrderNumber"/>
 
       <Search :class="$style.search"
               :value="companyFilterValue"
-              placeholder="Название компании"
-              :width="15"
+              placeholder="Наименование клиента"
+              :width="16.1"
               @input="handleCompanyNameInput"
               @clear="handleClearCompanyName"/>
     </div>
-    <div :class="$style.cards" v-if="medCards.length && !isLoading">
+    <div v-if="medCards.length && !isLoading"
+         :class="$style.cards">
       <MedInstitutionCard v-for="card in medCards"
-                          v-bind="card"
-                          @click="handleClickCard(card)"/>
+                          :key="card.orderNumber"
+                          v-bind="card"/>
     </div>
 
-    <div :class="$style.cards" v-else-if="!medCards.length && isLoading">
-      <v-sheet
-          v-for="i in 10" :id="i"
-          color="grey lighten-4"
-          class="pa-3"
-      >
+    <div v-else-if="!medCards.length && isLoading"
+         :class="$style.cards">
+      <v-sheet v-for="i in 10"
+               :key="i"
+               color="grey lighten-4"
+               class="pa-3">
         <v-skeleton-loader
             :class="$style.skeletonCard"
             elevation="4"
@@ -36,15 +37,19 @@
       </v-sheet>
     </div>
 
-    <div v-else-if="!medCards.length">
-      <div>Нет результатов</div>
+    <div v-else-if="!medCards.length" :class="$style.noFilterResultContainer">
+      <div :class="$style.noFilterResultText">
+        По заданным фильтрам нет результатов
+      </div>
+      <v-btn rounded color="primary" dark @click="handleClearAllFilters">
+        Сбросить фильтры
+      </v-btn>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { MedCard } from "@/types";
 import { homeModule } from "@/store";
 
 import MedInstitutionCard from "../components/MedInstitutionCard.vue";
@@ -60,20 +65,20 @@ import Search from "../components/Search.vue";
     homeModule.actions.prepareMedCards();
   },
   methods: {
-    handleClickCard (card: MedCard) {
-      card.showExpand = !card.showExpand;
-    },
     handleOrderNumberInput (value: string) {
       homeModule.actions.filterByOrder(value);
-    },
-    handleClearOrderNumber () {
-      homeModule.actions.clearOrderFilter();
     },
     handleCompanyNameInput (value: string) {
       homeModule.actions.filterByCompanyName(value);
     },
     handleClearCompanyName () {
       homeModule.actions.clearCompanyFilter();
+    },
+    handleClearOrderNumber () {
+      homeModule.actions.clearOrderFilter();
+    },
+    handleClearAllFilters () {
+      homeModule.actions.clearAllFilters();
     }
   },
   computed: {
@@ -95,9 +100,12 @@ export default class HomeView extends Vue {}
 </script>
 
 <style lang="scss" module>
-.root {
-  overflow-y: hidden;
-}
+ .root {
+   overflow-y: hidden;
+   display: flex;
+   flex-direction: column;
+ }
+
 .cards {
   position: relative;
   width: 100%;
@@ -109,16 +117,32 @@ export default class HomeView extends Vue {}
   -webkit-overflow-scrolling: touch;
   padding: 0.1rem 0 1rem 2rem;
 }
+
 .searches {
   display: flex;
   flex-direction: row;
   margin: 2rem 2rem 0 2rem;
 }
+
 .search {
   margin-left: 1rem;
 }
+
 .skeletonCard {
   width: 300px;
   height: 200px;
+}
+
+.noFilterResultContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.noFilterResultText {
+  font-weight: normal;
+  font-size: large;
+  margin-bottom: 0.5rem;
 }
 </style>

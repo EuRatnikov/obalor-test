@@ -1,27 +1,23 @@
 <template>
-  <v-card :class="rootClasses" width="210" elevation="4" @click="showExpand = !showExpand">
-    <div :class="$style.medName" v-text="medName"/>
+  <v-card class="d-flex flex-column" :class="rootClasses" width="220" elevation="4" @click="showExpand = !showExpand">
+    <div :class="$style.header">
+      <div :class="$style.medName" v-text="medName"/>
+      <v-checkbox v-show="showExpand" :class="$style.checkBox" v-model="isCardSelected" @click.stop/>
+    </div>
+
     <div :class="$style.budget" v-text="`${medBudget} руб.`"/>
     <div :class="$style.companyName" v-text="companyName"/>
     <div :class="$style.innNumber" v-text="innNumber"/>
 
     <v-expand-transition>
-      <div v-if="showExpand">
+      <div v-show="showExpand">
         <div :class="$style.statusContainer">
-          <v-chip v-for="status in orderStatuses"
-                  :class="$style.status"
-                  v-text="status"
-                  color="#bdbde5"
-                  text-color="white"/>
+          <v-chip v-for="status in orderStatuses" :class="$style.status" v-text="status" color="#bdbde5" text-color="white" small/>
         </div>
         <div :class="$style.customerName" v-text="customerName"/>
 
         <div :class="$style.statusContainer">
-          <v-chip v-for="program in orderPrograms"
-                  :class="$style.status"
-                  v-text="program"
-                  color="primary"
-                  text-color="white"/>
+          <v-chip v-for="program in orderPrograms" :class="$style.status" v-text="program" color="primary" text-color="white" small/>
         </div>
       </div>
     </v-expand-transition>
@@ -40,9 +36,10 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 @Component
 export default class MedInstitutionCard extends Vue {
   showExpand = false
+  isCardSelected = false
   @Prop ({ required: true }) medName!: string
   @Prop ({ required: true }) medBudget!: string
-  @Prop ({ default: null })companyName!: string
+  @Prop ({ default: null }) companyName!: string
   @Prop ({ default: null }) innNumber!: string
   @Prop ({ default: null }) orderStatuses!: string[]
   @Prop ({ default: null }) orderPrograms!: string[]
@@ -50,11 +47,12 @@ export default class MedInstitutionCard extends Vue {
   @Prop ({ default: null }) orderNumber!: string
   @Prop ({ default: null }) orderDate!: string
 
-  get rootClasses() {
+  get rootClasses () {
     return [
       this.$style.root,
       {
-        [this.$style.maxCardHeight]: !this.showExpand
+        [this.$style.expand]: this.showExpand,
+        [this.$style.normalState]: !this.showExpand,
       }
     ];
   }
@@ -62,38 +60,36 @@ export default class MedInstitutionCard extends Vue {
 </script>
 
 <style lang="scss" module>
-.root {
-  margin: 0 1rem 1rem 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.maxCardHeight {
-  max-height: 198px;
-}
-
-  .medName,
-  .budget,
-  .companyName,
-  .orderDate {
-    margin-left: 1rem;
+  .root {
+    margin: 0 1rem 1rem 0;
+    display: flex;
   }
 
-  .innNumber,
-  .orderNumber,
-  .orderDate {
-    color: gray;
+  .expand {
+    height: fit-content;
+  }
+
+  .normalState {
+    max-height: 11.9rem;
+  }
+
+  .header {
+    display: flex;
+    padding-top: 0.5rem;
+  }
+
+  .checkBox {
+    margin-top: unset;
+  }
+
+  .medName {
+    margin-right: 1rem;
+    font-size: large;
+    font-weight: bold;
   }
 
   .budget {
     font-size: medium;
-  }
-
-  .medName {
-    padding-top: 1rem;
-    padding-right: 0.5rem;
-    font-size: large;
-    font-weight: bold;
   }
 
   .companyName {
@@ -142,6 +138,19 @@ export default class MedInstitutionCard extends Vue {
     background: #e5e5f8;
     font-size: medium;
     font-weight: bold;
+  }
+
+  .header,
+  .budget,
+  .companyName,
+  .orderDate {
+    margin-left: 1rem;
+  }
+
+  .innNumber,
+  .orderNumber,
+  .orderDate {
+    color: gray;
   }
 </style>
 

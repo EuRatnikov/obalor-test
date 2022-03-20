@@ -10,40 +10,18 @@
                   autofocus
                   clearable
                   rounded
-                  @input="handleInput"
-                  @click:append="handleClear"/>
+                  @input="$emit('input', $event)"
+                  @click:append="$emit('clear')"/>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
+import { Component, Prop, Vue } from 'vue-property-decorator';
 
-@Component ({
-  name: 'Search',
-
-  props: {
-    value: {
-      type: String,
-      default: null
-    },
-    placeholder: {
-      type: String,
-      default: null
-    },
-    width: {
-      type: Number,
-      default: 12
-    }
-  },
-
-  methods: {
-    handleInput (value: string) {
-      this.$emit('input', value);
-    },
-    handleClear () {
-      this.$emit('clear');
-    }
-  }
-})
-export default class Search extends Vue {}
+@Component
+export default class Search extends Vue {
+  @Prop ({ default: null }) value!: string
+  @Prop ({ default: null }) placeholder!: string
+  @Prop ({ default: null }) width!: number
+}
 </script>

@@ -1,6 +1,7 @@
-import {Mutations} from "vuex-smart-module";
-import HomeState from "./state";
+import { Mutations } from "vuex-smart-module";
 import { MedCard } from "@/types";
+
+import HomeState from "./state";
 
 export default class HomeMutations extends Mutations<HomeState> {
     setMedCards (cards: MedCard[]) {
